@@ -1,0 +1,248 @@
+<!doctype html>
+<html>
+<head>
+    <title>CSS buttons test</title>
+    <style type="text/less">
+        
+        /**
+            This CSS uses LESS syntax for convenience and brevity:
+            http://lesscss.org/
+            
+            Since this is a plain HTML file, it uses a JS parser to convert the
+            LESS to CSS at runtime in the browser:
+            http://github.com/cloudhead/less.js
+            
+            See this article for a brief overview and usage:
+            http://fadeyev.net/2010/06/19/lessjs-will-obsolete-css/
+        **/
+        
+        /** Constants **/
+        
+        @viewerWidth: 675px;
+        @viewerHeight: 327px;
+        
+        // Seadragon Ajax style:
+        @sprite: url(seajax-sprite.png);
+        @buttonWidth: 35px;
+        @buttonHeight: 34px;
+        @shadow: url(http://seadragon.com/images/site/viewerShadow.png);
+        @borderColor: black;
+        
+        // Zoom.it style:
+        /*
+        @sprite: url(zoomit-sprite.png);
+        @buttonWidth: 33px;
+        @buttonHeight: 34px;
+        @shadow: url(http://zoom.it/images/site/viewerShadow.png);
+        @borderColor: white;
+        */
+        
+        /** General look-and-feel **/
+        
+        #viewer-container {
+            margin: auto;
+            width: @viewerWidth + 2px;
+            height: @viewerHeight + 2px;
+            padding: 6px;
+            background: @shadow;
+        }
+        
+        #viewer {
+            width: @viewerWidth;
+            height: @viewerHeight;
+            background-color: black;
+            border: 1px solid @borderColor;
+            position: relative;
+        }
+        
+        #nav {
+            position: absolute;
+            right: 0px;
+            bottom: 0px;
+            display: inline-block;
+            padding: 4px;
+        }
+        
+        button {
+            margin: 0;
+            padding: 0;
+            border: none;
+            outline: none;
+            text-indent: 10em;
+            background: @sprite;
+            width: @buttonWidth;
+            height: @buttonHeight;
+        }
+        
+        /**
+            Sprite reference:
+            
+            Four rows for four buttons: zoomin, zoomout, home, fullpage.
+            Four cols for four states: rest, group, hover, pressed.
+            
+            Each button state is @buttonWidth x @buttonHeight (e.g. 35x34).
+            The total sprite is thus 4*@buttonWidth x 4*@buttonHeight (e.g. 140x136).
+        **/
+        
+        .showSprite (@col: 0, @row: 0) {
+            background-position: (0 - @col * @buttonWidth) (0 - @row * @buttonHeight);
+        }
+        
+        /** Transition helpers **/
+        
+        .snapOpacity (@opacity: 1.0) {
+            -webkit-transition-property: opacity;
+            -webkit-transition-timing-function: linear;
+            -webkit-transition-delay: 0s;
+            -webkit-transition-duration: 0s;
+            opacity: @opacity;
+        }
+        
+        .fadeOpacity (@opacity: 0.0) {
+            -webkit-transition-property: opacity;
+            -webkit-transition-timing-function: linear;
+            -webkit-transition-delay: 1s;
+            -webkit-transition-duration: 2s;
+            opacity: @opacity;
+        }
+        
+        /** State definitions **/
+        
+        // By default, controls start at full opacity:
+        
+        div.group {
+            .snapOpacity();
+        }
+        
+        // When the mouse is off the viewer, fade all controls:
+        
+        #viewer div.group {
+            .fadeOpacity();
+        }
+        
+        // When the mouse is on the viewer, show all controls fully:
+        
+        #viewer:hover div.group {
+            .snapOpacity();
+        }
+        
+        // When the mouse is off the button group, show the rest state:
+        
+        div.group {
+            
+            button#zoomin {
+                .showSprite(0, 0);
+            }
+            
+            button#zoomout {
+                .showSprite(0, 1);
+            }
+            
+            button#home {
+                .showSprite(0, 2);
+            }
+            
+            button#fullpage {
+                .showSprite(0, 3);
+            }
+            
+        }
+        
+        // When the mouse is over the button group, show the group state:
+        
+        div.group:hover {
+            
+            button#zoomin {
+                .showSprite(1, 0);
+            }
+            
+            button#zoomout {
+                .showSprite(1, 1);
+            }
+            
+            button#home {
+                .showSprite(1, 2);
+            }
+            
+            button#fullpage {
+                .showSprite(1, 3);
+            }
+            
+        }
+        
+        // When the mouse is over a particular button, show its hover state:
+        // Note the equally longer selector in order to maintain specificity.
+        
+        div.group {
+            
+            button#zoomin:hover {
+                .showSprite(2, 0);
+            }
+            
+            button#zoomout:hover {
+                .showSprite(2, 1);
+            }
+            
+            button#home:hover {
+                .showSprite(2, 2);
+            }
+            
+            button#fullpage:hover {
+                .showSprite(2, 3);
+            }
+            
+        }
+        
+        // Finally, when a button is pressed, show its pressed state:
+        
+        div.group {
+            
+            button#zoomin:active {
+                .showSprite(3, 0);
+            }
+            
+            button#zoomout:active {
+                .showSprite(3, 1);
+            }
+            
+            button#home:active {
+                .showSprite(3, 2);
+            }
+            
+            button#fullpage:active {
+                .showSprite(3, 3);
+            }
+            
+        }
+        
+        // TODO support keyboard:
+        // - users can focus buttons via tab switching. (equivalent to hover)
+        // - users can activate buttons by pressing space.
+        // - if a button has keyboard focus, other buttons should be in group
+        //   state even if the mouse isn't over the group.
+        // - likewise, if a button is active, other buttons should be in group
+        //   state even if the mouse isn't over the group.
+        // - be careful though with focus though -- buttons remain in focus
+        //   even after they've been clicked. so if the mouse moves over
+        //   another button, the focused button should no longer be hovered.
+        
+    </style>
+    <script src="http://lesscss.googlecode.com/files/less-1.0.41.min.js"></script>
+    <script>
+        less.env = "development";
+        less.refresh();
+    </script>
+</head>
+<body>
+    <div id="viewer-container">
+        <div id="viewer">
+            <div id="nav" class="group"><!-- (ensure no whitespace between buttons)
+                --><button id="zoomin" title="Zoom in"></button><!--
+                --><button id="zoomout" title="Zoom out"></button><!--
+                --><button id="home" title="Go home"></button><!--
+                --><button id="fullpage" title="Full page"></button><!--
+            --></div>
+        </div>
+    </div>
+</body>
+</html>
